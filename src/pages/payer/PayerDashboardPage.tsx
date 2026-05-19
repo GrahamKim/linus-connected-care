@@ -27,6 +27,24 @@ function FunnelBar({ label, value, max, color }: { label: string; value: number;
   )
 }
 
+function OutcomeBar({ label, value, total, color, pill }: { label: string; value: number; total: number; color: string; pill: string }) {
+  const width = total > 0 ? Math.round((value / total) * 100) : 0
+  return (
+    <div className="flex items-center gap-4">
+      <div className="w-40 shrink-0">
+        <span className={`inline-flex px-2 py-0.5 rounded text-xs font-medium ${pill}`}>{label}</span>
+      </div>
+      <div className="flex-1 h-7 bg-gray-100 rounded-lg overflow-hidden relative">
+        <div className={`h-full rounded-lg transition-all ${color}`} style={{ width: `${width}%` }} />
+        <div className="absolute inset-0 flex items-center px-3">
+          <span className="text-xs font-bold text-gray-800">{value.toLocaleString()}</span>
+          <span className="text-xs text-gray-500 ml-2">({width}% of assessed)</span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function DemographicTable({ cuts }: { cuts: DemographicCut[] }) {
   return (
     <div className="overflow-x-auto">
@@ -121,6 +139,57 @@ export default function PayerDashboardPage() {
           <FunnelBar label="Assessed" value={metrics.membersAssessed} max={maxMembers} color="bg-amber-400" />
           <FunnelBar label="Research referred" value={metrics.membersReferred} max={maxMembers} color="bg-purple-400" />
         </div>
+      </div>
+
+      {/* Assessment outcomes */}
+      <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm mb-6">
+        <div className="mb-5">
+          <h3 className="text-sm font-semibold text-gray-700">Assessment Outcomes</h3>
+          <p className="text-xs text-gray-400 mt-1">Among members who completed cognitive screening — validates accuracy of claims-based risk identification</p>
+        </div>
+        <div className="space-y-3 mb-5">
+          <OutcomeBar label="Below expected range" value={metrics.assessmentOutcomes.belowExpected} total={metrics.membersAssessed} color="bg-red-400" pill="bg-red-100 text-red-700" />
+          <OutcomeBar label="Mildly below expected" value={metrics.assessmentOutcomes.mildlyBelow} total={metrics.membersAssessed} color="bg-amber-400" pill="bg-amber-100 text-amber-700" />
+          <OutcomeBar label="Within expected range" value={metrics.assessmentOutcomes.withinExpected} total={metrics.membersAssessed} color="bg-green-400" pill="bg-green-100 text-green-700" />
+        </div>
+        {(() => {
+          const confirmed = metrics.assessmentOutcomes.belowExpected + metrics.assessmentOutcomes.mildlyBelow
+          const confirmedPct = Math.round((confirmed / metrics.membersAssessed) * 100)
+          return (
+            <div className="bg-gray-50 rounded-lg px-4 py-3 text-sm text-gray-600">
+              <span className="font-semibold text-gray-800">{confirmedPct}%</span> of assessed members showed signs of cognitive impairment (below or mildly below expected range), validating the upstream claims-based risk signal.
+            </div>
+          )
+        })()}
+        {selectedSiteId === 'ALL' && (
+          <div className="mt-5 overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="border-b border-gray-100">
+                  <th className="text-left py-2 pr-4 font-semibold text-gray-500 uppercase tracking-wide">Site</th>
+                  <th className="text-right py-2 px-3 font-semibold text-red-500 uppercase tracking-wide">Below expected</th>
+                  <th className="text-right py-2 px-3 font-semibold text-amber-500 uppercase tracking-wide">Mildly below</th>
+                  <th className="text-right py-2 px-3 font-semibold text-green-600 uppercase tracking-wide">Within expected</th>
+                  <th className="text-right py-2 pl-3 font-semibold text-gray-500 uppercase tracking-wide">Signal confirmed</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {FUNNEL_DATA.map((site) => {
+                  const confirmed = site.assessmentOutcomes.belowExpected + site.assessmentOutcomes.mildlyBelow
+                  return (
+                    <tr key={site.siteId} className="hover:bg-gray-50">
+                      <td className="py-2.5 pr-4 font-medium text-gray-700">{site.siteName}</td>
+                      <td className="text-right py-2.5 px-3 text-gray-600">{site.assessmentOutcomes.belowExpected} <span className="text-gray-400">({pct(site.assessmentOutcomes.belowExpected, site.membersAssessed)})</span></td>
+                      <td className="text-right py-2.5 px-3 text-gray-600">{site.assessmentOutcomes.mildlyBelow} <span className="text-gray-400">({pct(site.assessmentOutcomes.mildlyBelow, site.membersAssessed)})</span></td>
+                      <td className="text-right py-2.5 px-3 text-gray-600">{site.assessmentOutcomes.withinExpected} <span className="text-gray-400">({pct(site.assessmentOutcomes.withinExpected, site.membersAssessed)})</span></td>
+                      <td className="text-right py-2.5 pl-3 font-semibold text-gray-800">{pct(confirmed, site.membersAssessed)}</td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       {/* Site breakdown */}

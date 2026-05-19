@@ -1,4 +1,4 @@
-import { FunnelMetrics } from '../types'
+import { FunnelMetrics, AssessmentOutcomes } from '../types'
 
 export const FUNNEL_DATA: FunnelMetrics[] = [
   {
@@ -9,6 +9,7 @@ export const FUNNEL_DATA: FunnelMetrics[] = [
     membersContacted: 112,
     membersAssessed: 71,
     membersReferred: 18,
+    assessmentOutcomes: { belowExpected: 31, mildlyBelow: 17, withinExpected: 23 },
     byAgeGroup: [
       { label: '65–74', identified: 48, contacted: 38, assessed: 26, referred: 5 },
       { label: '75–84', identified: 72, contacted: 55, assessed: 35, referred: 10 },
@@ -27,6 +28,7 @@ export const FUNNEL_DATA: FunnelMetrics[] = [
     membersContacted: 141,
     membersAssessed: 88,
     membersReferred: 22,
+    assessmentOutcomes: { belowExpected: 28, mildlyBelow: 26, withinExpected: 34 },
     byAgeGroup: [
       { label: '65–74', identified: 89, contacted: 64, assessed: 41, referred: 9 },
       { label: '75–84', identified: 88, contacted: 61, assessed: 38, referred: 10 },
@@ -45,6 +47,7 @@ export const FUNNEL_DATA: FunnelMetrics[] = [
     membersContacted: 78,
     membersAssessed: 54,
     membersReferred: 14,
+    assessmentOutcomes: { belowExpected: 26, mildlyBelow: 14, withinExpected: 14 },
     byAgeGroup: [
       { label: '65–74', identified: 22, contacted: 18, assessed: 13, referred: 3 },
       { label: '75–84', identified: 51, contacted: 42, assessed: 30, referred: 8 },
@@ -67,6 +70,11 @@ export function getAllSitesFunnel(): FunnelMetrics {
       membersContacted: acc.membersContacted + site.membersContacted,
       membersAssessed: acc.membersAssessed + site.membersAssessed,
       membersReferred: acc.membersReferred + site.membersReferred,
+      assessmentOutcomes: {
+        belowExpected: acc.assessmentOutcomes.belowExpected + site.assessmentOutcomes.belowExpected,
+        mildlyBelow: acc.assessmentOutcomes.mildlyBelow + site.assessmentOutcomes.mildlyBelow,
+        withinExpected: acc.assessmentOutcomes.withinExpected + site.assessmentOutcomes.withinExpected,
+      },
       byAgeGroup: [
         { label: '65–74', identified: 0, contacted: 0, assessed: 0, referred: 0 },
         { label: '75–84', identified: 0, contacted: 0, assessed: 0, referred: 0 },
@@ -85,6 +93,7 @@ export function getAllSitesFunnel(): FunnelMetrics {
       membersContacted: 0,
       membersAssessed: 0,
       membersReferred: 0,
+      assessmentOutcomes: { belowExpected: 0, mildlyBelow: 0, withinExpected: 0 } as AssessmentOutcomes,
       byAgeGroup: [] as { label: string; identified: number; contacted: number; assessed: number; referred: number }[],
       byGender: [] as { label: string; identified: number; contacted: number; assessed: number; referred: number }[],
     }

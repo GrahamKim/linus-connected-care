@@ -93,6 +93,12 @@ export interface DemographicCut {
   referred: number
 }
 
+export interface AssessmentOutcomes {
+  belowExpected: number
+  mildlyBelow: number
+  withinExpected: number
+}
+
 export interface FunnelMetrics {
   siteId: string
   siteName: string
@@ -101,6 +107,7 @@ export interface FunnelMetrics {
   membersContacted: number
   membersAssessed: number
   membersReferred: number
+  assessmentOutcomes: AssessmentOutcomes
   byAgeGroup: DemographicCut[]
   byGender: DemographicCut[]
 }
